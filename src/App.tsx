@@ -166,6 +166,7 @@ const App: React.FC = () => {
   return (
     <div style={{ padding: "2rem" }}>
       <h1>ToDoリスト</h1>
+      <p><a href="https://github.com/yutashiina/react-todo-app2.git" target="_blank">ソースコード</a></p>
 
       {/* 新規グループ追加 */}
       <div style={{ marginBottom: "1rem" }}>
