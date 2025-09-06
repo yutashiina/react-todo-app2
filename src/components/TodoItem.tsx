@@ -18,7 +18,8 @@ const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete, onEdit }) => {
     setIsEditing(false);
   };
 
-  const color = todo.completed ? "#888" : todo.isDueSoon ? "red" : "black";
+  const color = todo.completed ? "#888" : todo.isDueSoon ? "red" : "white";
+  const deco = todo.completed ? "line-through" : todo.isDueSoon ? "none" : "none";
 
   return (
     <li style={{ margin: "0.5rem 0", color }}>
@@ -31,9 +32,9 @@ const TodoItem: React.FC<Props> = ({ todo, onToggle, onDelete, onEdit }) => {
         </>
       ) : (
         <>
-          <span style={{ marginLeft: "0.5rem" }}>{todo.text}</span>
+          <span style={{ marginLeft: "0.5rem" , textDecoration: deco }}>{todo.text}</span>
           {todo.dueDate && (
-            <span style={{ marginLeft: "0.5rem", color }}>
+            <span style={{ marginLeft: "0.5rem", color , textDecoration: deco }}>
               (期限: {new Date(todo.dueDate).toLocaleString()})
             </span>
           )}

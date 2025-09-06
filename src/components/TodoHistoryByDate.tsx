@@ -44,7 +44,7 @@ const TodoHistoryByDate: React.FC<TodoHistoryByDateProps> = ({ todos, onDelete }
               <button onClick={() => toggleCollapse(date)} style={{ marginRight: "0.5rem" }}>
                 {collapsedDates[date] ? "▶" : "▼"}
               </button>
-              <h3>{date}</h3>
+              <h3 style={{ color: "#000" }}>{date}</h3>
             </div>
             <button onClick={() => grouped[date].forEach(todo => onDelete(todo.id))}>
               この日付の履歴を全削除
@@ -53,7 +53,7 @@ const TodoHistoryByDate: React.FC<TodoHistoryByDateProps> = ({ todos, onDelete }
           {!collapsedDates[date] && (
             <ul style={{ marginTop: "0.5rem" }}>
               {grouped[date].map(todo => (
-                <li key={todo.id} style={{ margin: "0.3rem 0", color: "#555" }}>
+                <li key={todo.id} style={{ margin: "0.3rem 0", color: "#555", textDecoration: "line-through" }}>
                   <span style={{ textDecoration: "line-through", marginRight: "0.5rem", color: "#888" }}>
                     {todo.text}
                   </span>
