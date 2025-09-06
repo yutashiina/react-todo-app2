@@ -1,37 +1,39 @@
 import React, { useState } from "react";
+import type { TodoInputProps } from "../types";
 
-interface TodoInputProps {
-  onAdd: (text: string, dueDate?: string) => void;
-}
-
-const TodoInput: React.FC<TodoInputProps> = ({ onAdd }) => {
-  const [inputValue, setInputValue] = useState("");
-  const [dueDate, setDueDate] = useState("");
+const TodoInput: React.FC<TodoInputProps> = ({ onAdd, groups = [] }) => {
+  const [text, setText] = useState("");
+  const [dueDate, setDueDate] = useState<string>();
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
 
   const handleAdd = () => {
-    if (!inputValue.trim()) return;
-    onAdd(inputValue, dueDate || undefined);
-    setInputValue("");
-    setDueDate("");
+    if (!text.trim()) return;
+    onAdd(text, dueDate, selectedGroup || undefined);
+    setText("");
+    setDueDate(undefined);
+    setSelectedGroup("");
   };
 
   return (
     <div style={{ marginBottom: "1rem" }}>
       <input
         type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        placeholder="新しいToDoを入力"
+        placeholder="タスク名"
+        value={text}
+        onChange={e => setText(e.target.value)}
       />
       <input
-        type="datetime-local"
-        value={dueDate}
-        onChange={(e) => setDueDate(e.target.value)}
-        style={{ marginLeft: "0.5rem" }}
+        type="date"
+        value={dueDate || ""}
+        onChange={e => setDueDate(e.target.value)}
       />
-      <button onClick={handleAdd} style={{ marginLeft: "0.5rem" }}>
-        追加
-      </button>
+      <select value={selectedGroup} onChange={e => setSelectedGroup(e.target.value)}>
+        <option value="">未分類</option>
+        {groups.map(group => (
+          <option key={group} value={group}>{group}</option>
+        ))}
+      </select>
+      <button onClick={handleAdd}>追加</button>
     </div>
   );
 };

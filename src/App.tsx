@@ -9,14 +9,19 @@ const LOCAL_STORAGE_KEY = "my_todo_app";
 const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [dueAlerts, setDueAlerts] = useState<Todo[]>([]);
+  const [groups, setGroups] = useState<string[]>([]);
+  const [newGroupName, setNewGroupName] = useState("");
 
-  // localStorageからロード
   useEffect(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (saved) setTodos(JSON.parse(saved));
   }, []);
 
-  // ページ開いた時＆1分ごとに期限チェック
+  useEffect(() => {
+    const uniqueGroups = Array.from(new Set(todos.map(todo => todo.group || "未分類")));
+    setGroups(prev => Array.from(new Set([...prev, ...uniqueGroups])));
+  }, [todos]);
+
   useEffect(() => {
     const checkDueSoon = () => {
       setTodos(prevTodos => {
@@ -26,7 +31,6 @@ const App: React.FC = () => {
         const updatedTodos = prevTodos.map(todo => {
           if (!todo.completed && todo.dueDate) {
             const diff = new Date(todo.dueDate).getTime() - now.getTime();
-
             if (diff <= 10 * 60 * 1000) {
               if (!todo.alerted) newDueAlerts.push(todo);
               return { ...todo, isDueSoon: true, alerted: true };
@@ -65,7 +69,6 @@ const App: React.FC = () => {
     const newTodo: Todo = { id: Date.now(), text, completed: false, dueDate, group };
     let updatedTodos = [...todos, newTodo];
 
-    // 追加時に期限チェック
     const now = new Date();
     const newDueAlerts: Todo[] = [];
     if (dueDate) {
@@ -82,9 +85,10 @@ const App: React.FC = () => {
 
     const storageTodos = updatedTodos.map(({ isDueSoon, alerted, ...rest }) => rest);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(storageTodos));
+
+    if (group && !groups.includes(group)) setGroups(prev => [...prev, group]);
   };
 
-  // チェック時・未チェック時のアラート同期
   const toggleTodo = (id: number) => {
     setTodos(prevTodos => {
       const now = new Date();
@@ -97,10 +101,8 @@ const App: React.FC = () => {
           };
 
           if (updated.completed) {
-            // 完了したらアラート削除
             setDueAlerts(prev => prev.filter(a => a.id !== id));
           } else {
-            // チェックを外した場合、期限が近ければアラート再表示
             if (updated.dueDate) {
               const diff = new Date(updated.dueDate).getTime() - now.getTime();
               if (diff <= 10 * 60 * 1000) {
@@ -147,16 +149,36 @@ const App: React.FC = () => {
     const remaining = todos.filter(todo => (todo.group || "未分類") !== groupName);
     saveTodos(remaining);
     setDueAlerts(prev => prev.filter(todo => (todo.group || "未分類") !== groupName));
+    setGroups(prev => prev.filter(g => g !== groupName));
   };
 
   const closeAlert = (id: number) => {
     setDueAlerts(prev => prev.filter(todo => todo.id !== id));
   };
 
+  const addGroup = () => {
+    const trimmed = newGroupName.trim();
+    if (!trimmed) return;
+    if (!groups.includes(trimmed)) setGroups(prev => [...prev, trimmed]);
+    setNewGroupName("");
+  };
+
   return (
     <div style={{ padding: "2rem" }}>
       <h1>ToDoリスト</h1>
-      <TodoInput onAdd={addTodo} />
+
+      {/* 新規グループ追加 */}
+      <div style={{ marginBottom: "1rem" }}>
+        <input
+          type="text"
+          placeholder="新しいグループ名"
+          value={newGroupName}
+          onChange={e => setNewGroupName(e.target.value)}
+        />
+        <button onClick={addGroup}>追加</button>
+      </div>
+
+      <TodoInput onAdd={addTodo} groups={groups} />
       <TodoList
         todos={todos}
         onToggle={toggleTodo}

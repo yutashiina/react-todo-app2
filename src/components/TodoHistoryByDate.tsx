@@ -57,11 +57,14 @@ const TodoHistoryByDate: React.FC<TodoHistoryByDateProps> = ({ todos, onDelete }
                   <span style={{ textDecoration: "line-through", marginRight: "0.5rem", color: "#888" }}>
                     {todo.text}
                   </span>
-                  {todo.dueDate && (
-                    <span style={{ color: "#aaa", marginRight: "0.5rem" }}>
+                  <span style={{ color: "#555", marginRight: "0.5rem" }}>
+                    [{todo.group || "未分類"}]
+                  </span>
+                  {/*{todo.dueDate && (
+                    <span style={{ color: "#555", marginRight: "0.5rem" }}>
                       (期限: {new Date(todo.dueDate).toLocaleString()})
                     </span>
-                  )}
+                  )}*/}
                   <button onClick={() => onDelete(todo.id)} style={{ marginLeft: "0.5rem" }}>
                     削除
                   </button>
